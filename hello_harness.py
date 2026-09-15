@@ -32,7 +32,8 @@ async def main():
     )
 
     print("Calling agent.run()")
-    response = await agent.run("Tell me what the hello_harness.py program does.")
+    #response = await agent.run("Tell me what the hello_harness.py program does.")
+    response = await agent.run("Please fix Hello.java so that it compiles and runs.")
     print(response.output)
 
 
