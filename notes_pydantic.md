@@ -7,6 +7,9 @@ GitHub repositories:
 - [https://github.com/pydantic/pydantic-ai](https://github.com/pydantic/pydantic-ai)
 - [https://github.com/pydantic/pydantic-ai-harness](https://github.com/pydantic/pydantic-ai-harness)
 
+Articles:
+- [(pydantic.dev) Pydantic AI v2](https://pydantic.dev/articles/pydantic-ai-v2)
+- [(pydantic.dev) Pydantic Monty secure interpreter](https://pydantic.dev/articles/pydantic-monty)
 
 ## pydantic-ai-harness
 
