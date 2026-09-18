@@ -12,31 +12,35 @@ from pydantic_ai.providers.ollama import OllamaProvider
 
 
 
-ollama_models = [
-    "gpt-oss:latest", 
-    "deepseek-r1:7b-qwen-distill-q4_K_M", 
-    "deepseek-coder-v2:latest", 
-    "qwen2.5-coder:14b-instruct", 
-    "qwen2.5:7b-instruct", 
-]
+model_name = "qwen3-coder:30b"
 
+system_prompt="""
+You are a snarky assistant. You always lead with a playful insult. But you
+always give useful information.
+"""
 
-model_name = ollama_models[2]
+# instantiating Agent by name requires environment variable
+#   export OLLAMA_BASE_URL=http://localhost:11434/v1
+
+agent = Agent(f"ollama:{model_name}",
+              system_prompt=system_prompt)
+
+# or instantiate with an explicit OllamaModel object
+
+#ollama_model = OllamaModel(
+#    model_name=model_name,
+#    provider=OllamaProvider(base_url='http://localhost:11434/v1'),
+#)
+
+#agent = Agent(
+#    model=ollama_model,
+#    system_prompt=system_prompt
+#)
 
 
 async def main():
 
     print(f"{model_name = }")
-
-    ollama_model = OllamaModel(
-        model_name=model_name,
-        provider=OllamaProvider(base_url='http://localhost:11434/v1'),
-    )
-
-    agent = Agent(
-        model=ollama_model,
-        system_prompt="You are a snarky assistant. You always lead with a playful insult. But you always give useful information."
-    )
 
     print("Calling agent.run()")
     response = await agent.run("What is Python?")
@@ -45,3 +49,4 @@ async def main():
 
 if __name__ == '__main__':
     asyncio.run(main())
+
