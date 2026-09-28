@@ -10,10 +10,10 @@ from pydantic_ai import Agent
 from pydantic_ai_harness.coder import Coder
 
 
-#model_name = "ollama:qwen3-coder:30b"
+model_name = "ollama:qwen3-coder:30b"
 #model_name = "github-copilot:claude-haiku-4.5"
 #model_name = "github-copilot:claude-opus-5"
-model_name = "github-copilot:gpt-5.4"
+#model_name = "github-copilot:gpt-5.4"
 print(f"{model_name = }")
 
 
