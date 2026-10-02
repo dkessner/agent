@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# hello_harness.py
+# harness_opentelemetry.py
 #
 
 
@@ -9,15 +9,11 @@ import asyncio
 from pydantic_ai import Agent
 from pydantic_ai_harness.coder import Coder
 
-
-# logging 
-
 from pydantic_ai.capabilities import Instrumentation
 from pydantic_ai.models.instrumented import InstrumentationSettings
 
-import logfire
-logfire.configure(send_to_logfire=False, console=logfire.ConsoleOptions(verbose=True))
-logfire.instrument_pydantic_ai()
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor, ConsoleSpanExporter
 
 import json
 from pydantic_core import to_jsonable_python
@@ -32,13 +28,20 @@ print(f"{model_name = }")
 
 async def main():
 
+    f = open("agent_trace.jsonl", "w")
+    provider = TracerProvider()
+    provider.add_span_processor(BatchSpanProcessor(ConsoleSpanExporter(out=f)))
+
     agent = Agent(
         model=model_name,
-        name='coder',
-        capabilities=[Coder('.'),
-                      Instrumentation(settings=
-                          InstrumentationSettings(include_content=True)),
-                     ]
+        name="coder",
+        capabilities=[
+            Coder("."),
+            Instrumentation(settings=InstrumentationSettings(
+                include_content=True,
+                tracer_provider=provider,      # don't touch the global provider
+            )),
+        ],
     )
 
     print("Calling agent.run()")
@@ -51,6 +54,9 @@ async def main():
     with open("response.all_messages", "w") as f:
         json.dump(to_jsonable_python(response.all_messages()), f, indent=2)
 
+
+    provider.shutdown()   # flush + close
+    f.close()
 
 
 if __name__ == '__main__':

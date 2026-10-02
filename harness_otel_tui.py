@@ -1,23 +1,24 @@
 #!/usr/bin/env python
 #
-# hello_harness.py
+# harness_otel_tui.py
 #
-
 
 import asyncio
 
 from pydantic_ai import Agent
 from pydantic_ai_harness.coder import Coder
 
-
-# logging 
-
 from pydantic_ai.capabilities import Instrumentation
 from pydantic_ai.models.instrumented import InstrumentationSettings
 
-import logfire
-logfire.configure(send_to_logfire=False, console=logfire.ConsoleOptions(verbose=True))
-logfire.instrument_pydantic_ai()
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor, ConsoleSpanExporter
+from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
+from opentelemetry import trace
+
+# export OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318
+# export OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
+# export OTEL_SERVICE_NAME=coder-agent          # shows as the service column in otel-tui
 
 import json
 from pydantic_core import to_jsonable_python
@@ -32,13 +33,19 @@ print(f"{model_name = }")
 
 async def main():
 
+    provider = TracerProvider()
+    provider.add_span_processor(BatchSpanProcessor(OTLPSpanExporter()))  # endpoint from env
+    trace_file = open("agent_trace.jsonl", "w")
+    provider.add_span_processor(BatchSpanProcessor(ConsoleSpanExporter(out=trace_file)))
+    trace.set_tracer_provider(provider)
+
     agent = Agent(
         model=model_name,
         name='coder',
-        capabilities=[Coder('.'),
-                      Instrumentation(settings=
-                          InstrumentationSettings(include_content=True)),
-                     ]
+        capabilities=[
+            Coder('.'),
+            Instrumentation(settings=InstrumentationSettings(include_content=True)),
+        ],
     )
 
     print("Calling agent.run()")
