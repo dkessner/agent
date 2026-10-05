@@ -28,6 +28,23 @@ provided by the library, including a full [`Coder` harness](https://pydantic.dev
 model served locally via `ollama`.
 
 
+## interesting stuff
+
+If a run raises, the result object never materializes. Use
+capture_run_messages() to see what was exchanged:
+
+```python
+from pydantic_ai import Agent, capture_run_messages
+
+with capture_run_messages() as messages:
+    try:
+        result = agent.run_sync('foobar')
+    except Exception:
+        print(messages)
+        raise
+```
+
+
 ## first notes
 
 Agent
