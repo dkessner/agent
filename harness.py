@@ -28,7 +28,7 @@ print(f"{model_name = }")
 
 async def main():
 
-    telemetry.initialize_telemetry()
+    telemetry.initialize_global_tracer_provider()
 
     try:
         agent = Agent(
@@ -36,7 +36,10 @@ async def main():
             name='coder',
             capabilities=[
                 Coder('.'),
-                Instrumentation(settings=InstrumentationSettings(include_content=True)),
+                # Instrumentation: sends info to opentelemetry
+                # global tracer provider
+                Instrumentation(settings=
+                    InstrumentationSettings(include_content=True)),
             ],
         )
 

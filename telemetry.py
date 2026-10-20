@@ -17,7 +17,7 @@ from opentelemetry import trace
 #   export OTEL_SERVICE_NAME=coder-agent 
 
 
-def initialize_telemetry():
+def initialize_global_tracer_provider():
 
     provider = TracerProvider()
 
